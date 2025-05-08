@@ -1,67 +1,72 @@
 import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
-    name : {
-        type : String,
+    name: {
+        type: String,
+        required: true, // Ensure name is required
     },
-    image : {
-        type : Array,
-        default : []
+    image: {
+        type: Array,
+        default: [],
     },
-    category : [
+    category: [
         {
-            type : mongoose.Schema.ObjectId,
-            ref : 'category'
-        }
+            type: mongoose.Schema.ObjectId,
+            ref: "category",
+        },
     ],
-    subCategory : [
+    subCategory: [
         {
-            type : mongoose.Schema.ObjectId,
-            ref : 'subCategory'
-        }
+            type: mongoose.Schema.ObjectId,
+            ref: "subCategory",
+        },
     ],
-    unit : {
-        type : String,
-        default : ""
+    unit: {
+        type: String,
+        default: "",
     },
-    stock : {
-        type : Number,
-        default : null
+    stock: {
+        type: Number,
+        default: null,
     },
-    price : {
-        type : Number,
-        defualt : null
+    price: {
+        type: Number,
+        default: null, // Fixed typo from "defualt" to "default"
     },
-    discount : {
-        type : Number,
-        default : null
+    discount: {
+        type: Number,
+        default: null,
     },
-    description : {
-        type : String,
-        default : ""
+    description: {
+        type: String,
+        default: "",
     },
-    more_details : {
-        type : Object,
-        default : {}
+    more_details: {
+        type: Object,
+        default: {},
     },
-    publish : {
-        type : Boolean,
-        default : true
+    publish: {
+        type: Boolean,
+        default: true,
+    },
+}, {
+    timestamps: true,
+});
+
+// Create a text index for `name` and `description` with weights
+productSchema.index(
+    {
+        name: "text",
+        description: "text",
+    },
+    {
+        weights: {
+            name: 10, // Higher weight for `name`
+            description: 5, // Lower weight for `description`
+        },
     }
-},{
-    timestamps : true
-})
+);
 
-//create a text index
-productSchema.index({
-    name  : "text",
-    description : 'text'
-},{
-    name : 10,
-    description : 5
-})
+const ProductModel = mongoose.model("product", productSchema);
 
-
-const ProductModel = mongoose.model('product',productSchema)
-
-export default ProductModel
+export default ProductModel;

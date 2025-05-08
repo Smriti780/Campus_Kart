@@ -1,36 +1,68 @@
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
+import UserModel from '../models/user.model.js';
 
-const auth = async(request,response,next)=>{
+const auth = async (request, response, next) => {
     try {
-        const token = request.cookies.accessToken || request?.headers?.authorization?.split(" ")[1]
-       
-        if(!token){
+        // Get the token from Authorization header or cookies
+        const token = request.headers.authorization?.split(" ")[1] || request.cookies?.accessToken;
+        console.log("Token received in backend:", token); // Debugging
+
+        if (!token) {
             return response.status(401).json({
-                message : "Provide token"
-            })
+                message: "Token not provided. Please log in.",
+                error: true,
+                success: false
+            });
         }
 
-        const decode = await jwt.verify(token,process.env.SECRET_KEY_ACCESS_TOKEN)
-
-        if(!decode){
+        // Verify JWT token
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.SECRET_KEY_ACCESS_TOKEN);
+            console.log("Decoded token:", decoded); // Debugging
+        } catch (err) {
+            console.log("JWT Error:", err.message); // Debug why token verification failed
             return response.status(401).json({
-                message : "unauthorized access",
-                error : true,
-                success : false
-            })
+                message: "Invalid or expired token. Please log in again.",
+                error: true,
+                success: false
+            });
         }
 
-        request.userId = decode.id
+        // Ensure decoded token contains user ID
+        if (!decoded || !decoded.id) {
+            return response.status(401).json({
+                message: "Unauthorized access. Invalid token payload.",
+                error: true,
+                success: false
+            });
+        }
 
-        next()
+        // Fetch user from database
+        const user = await UserModel.findById(decoded.id).select("-password"); // Exclude password for security
+
+        if (!user) {
+            return response.status(404).json({
+                message: "User not found. Please log in again.",
+                error: true,
+                success: false
+            });
+        }
+
+        // Attach user information to request
+        request.userId = user._id;
+        request.user = user;
+
+        next();
 
     } catch (error) {
+        console.error("Auth Middleware Error:", error.message); // Improved error logging
         return response.status(500).json({
-            message : "You have not login",///error.message || error,
-            error : true,
-            success : false
-        })
+            message: "Internal server error. Please try again later.",
+            error: true,
+            success: false
+        });
     }
-}
+};
 
-export default auth
+export default auth;

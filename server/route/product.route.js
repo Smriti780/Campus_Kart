@@ -1,23 +1,31 @@
-import { Router } from 'express'
-import auth from '../middleware/auth.js'
-import { createProductController, deleteProductDetails, getProductByCategory, getProductByCategoryAndSubCategory, getProductController, getProductDetails, searchProduct, updateProductDetails } from '../controllers/product.controller.js'
-import { admin } from '../middleware/Admin.js'
+import { Router } from "express";
+import auth from "../middleware/auth.js";
+import { 
+    createProductController, 
+    deleteProductDetails, 
+    getProductByCategory, 
+    getProductByCategoryAndSubCategory, 
+    getProductController, 
+    getProductDetails, 
+    searchProduct, 
+    updateProductDetails 
+} from "../controllers/product.controller.js";
 
-const productRouter = Router()
+const productRouter = Router();
 
-productRouter.post("/create",auth,admin,createProductController)
-productRouter.post('/get',getProductController)
-productRouter.post("/get-product-by-category",getProductByCategory)
-productRouter.post('/get-pruduct-by-category-and-subcategory',getProductByCategoryAndSubCategory)
-productRouter.post('/get-product-details',getProductDetails)
+productRouter.post("/create", auth, createProductController);  // ❌ Removed admin
+productRouter.post("/get", getProductController);
+productRouter.post("/get-product-by-category", getProductByCategory);
+productRouter.post("/get-product-by-category-and-subcategory", getProductByCategoryAndSubCategory);
+productRouter.post("/get-product-details", getProductDetails);
 
-//update product
-productRouter.put('/update-product-details',auth,admin,updateProductDetails)
+// Update product
+productRouter.put("/update-product-details", auth, updateProductDetails);  // ❌ Removed admin
 
-//delete product
-productRouter.delete('/delete-product',auth,admin,deleteProductDetails)
+// Delete product
+productRouter.delete("/delete-product", auth, deleteProductDetails);  // ❌ Removed admin
 
-//search product 
-productRouter.post('/search-product',searchProduct)
+// Search product
+productRouter.post("/search-product", searchProduct);
 
-export default productRouter
+export default productRouter;

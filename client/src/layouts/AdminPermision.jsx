@@ -1,18 +1,15 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
-import isAdmin from '../utils/isAdmin'
+import React from 'react';
+import { useSelector } from 'react-redux';
 
-const AdminPermision = ({children}) => {
-    const user = useSelector(state => state.user)
+const AdminPermission = ({ children }) => {
+    const user = useSelector(state => state.user);
+    console.log("User from Redux:", user); // Debugging
 
+    return (
+        <>
+            {user ? children : <p className='text-red-600 bg-red-100 p-4'>Do not have permission</p>}
+        </>
+    );
+};
 
-  return (
-    <>
-        {
-            isAdmin(user.role) ?  children : <p className='text-red-600 bg-red-100 p-4'>Do not have permission</p>
-        }
-    </>
-  )
-}
-
-export default AdminPermision
+export default AdminPermission;

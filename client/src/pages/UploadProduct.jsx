@@ -171,7 +171,7 @@ const UploadProduct = () => {
                   <textarea 
                     id='description'
                     type='text'
-                    placeholder='Enter product description'
+                    placeholder='Enter product description and Seller Information'
                     name='description'
                     value={data.description}
                     onChange={handleChange}

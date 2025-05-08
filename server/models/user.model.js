@@ -1,79 +1,86 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-    name : {
-        type : String,
-        required : [true,"Provide name"]
+    name: {
+        type: String,
+        required: [true, "Provide name"]
     },
-    email : {
-        type : String,
-        required : [true, "provide email"],
-        unique : true
+    email: {
+        type: String,
+        required: [true, "Provide email"],
+        unique: true,
+        validate: {
+            validator: function(email) {
+                return email.endsWith("iiitg.ac.in"); // Ensure email belongs to the institute
+            },
+            message: "Only IIITG email addresses are allowed."
+        }
     },
-    password : {
-        type : String,
-        required : [true, "provide password"]
+    password: {
+        type: String,
+        required: [true, "Provide password"]
     },
-    avatar : {
-        type : String,
-        default : ""
+    avatar: {
+        type: String,
+        default: ""
     },
-    mobile : {
-        type : Number,
-        default : null
+    mobile: {
+        type: Number,
+        default: null
     },
-    refresh_token : {
-        type : String,
-        default : ""
+    refresh_token: {
+        type: String,
+        default: ""
     },
-    verify_email : {
-        type : Boolean,
-        default : false
+    isVerified: {  
+        type: Boolean,
+        default: false
     },
-    last_login_date : {
-        type : Date,
-        default : ""
+    last_login_date: {
+        type: Date,
+        default: null
     },
-    status : {
-        type : String,
-        enum : ["Active","Inactive","Suspended"],
-        default : "Active"
+    status: {
+        type: String,
+        enum: ["Active", "Inactive", "Suspended"],
+        default: "Active"
     },
-    address_details : [
+    address_details: [
         {
-            type : mongoose.Schema.ObjectId,
-            ref : 'address'
+            type: mongoose.Schema.ObjectId,
+            ref: "address"
         }
     ],
-    shopping_cart : [
+    saved_items: [  // Previously shopping_cart
         {
-            type : mongoose.Schema.ObjectId,
-            ref : 'cartProduct'
+            type: mongoose.Schema.ObjectId,
+            ref: "item"
         }
     ],
-    orderHistory : [
+    transactionHistory: [  // Previously orderHistory
         {
-            type : mongoose.Schema.ObjectId,
-            ref : 'order'
+            type: mongoose.Schema.ObjectId,
+            ref: "transaction"
         }
     ],
-    forgot_password_otp : {
-        type : String,
-        default : null
+    borrowRequests: [  // To track borrow requests
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: "borrowRequest"
+        }
+    ],
+    forgot_password_otp: {
+        type: String,
+        default: null
     },
-    forgot_password_expiry : {
-        type : Date,
-        default : ""
-    },
-    role : {
-        type : String,
-        enum : ['ADMIN',"USER"],
-        default : "USER"
+    forgot_password_expiry: {
+        type: Date,
+        default: null
     }
-},{
-    timestamps : true
-})
+}, {
+    timestamps: true
+});
 
-const UserModel = mongoose.model("User",userSchema)
+const UserModel = mongoose.model("User", userSchema);
 
-export default UserModel
+export default UserModel;

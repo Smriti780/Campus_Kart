@@ -71,7 +71,7 @@ const CategoryWiseProductDisplay = ({ id, name }) => {
     return (
         <div>
             <div className='container mx-auto p-4 flex items-center justify-between gap-4'>
-                <h3 className='font-semibold text-lg md:text-xl'>{name}</h3>
+                <h3 className='text-white font-semibold text-lg md:text-xl'>{name}</h3>
                 <Link  to={redirectURL} className='text-green-600 hover:text-green-400'>See All</Link>
             </div>
             <div className='relative flex items-center '>

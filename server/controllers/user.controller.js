@@ -9,66 +9,76 @@ import generatedOtp from '../utils/generatedOtp.js'
 import forgotPasswordTemplate from '../utils/forgotPasswordTemplate.js'
 import jwt from 'jsonwebtoken'
 
-export async function registerUserController(request,response){
+export async function registerUserController(request, response) {
     try {
-        const { name, email , password } = request.body
+        const { name, email, password } = request.body;
 
-        if(!name || !email || !password){
+        if (!name || !email || !password) {
             return response.status(400).json({
-                message : "provide email, name, password",
-                error : true,
-                success : false
-            })
+                message: "Provide email, name, and password",
+                error: true,
+                success: false
+            });
         }
 
-        const user = await UserModel.findOne({ email })
+        // ✅ Ensure email belongs to IIITG
+        if (!email.endsWith("@iiitg.ac.in")) {
+            return response.status(400).json({
+                message: "Only IIITG students can register",
+                error: true,
+                success: false
+            });
+        }
 
-        if(user){
+        const user = await UserModel.findOne({ email });
+
+        if (user) {
             return response.json({
-                message : "Already register email",
-                error : true,
-                success : false
-            })
+                message: "This email is already registered",
+                error: true,
+                success: false
+            });
         }
 
-        const salt = await bcryptjs.genSalt(10)
-        const hashPassword = await bcryptjs.hash(password,salt)
+        const salt = await bcryptjs.genSalt(10);
+        const hashPassword = await bcryptjs.hash(password, salt);
 
         const payload = {
             name,
             email,
-            password : hashPassword
-        }
+            password: hashPassword
+        };
 
-        const newUser = new UserModel(payload)
-        const save = await newUser.save()
+        const newUser = new UserModel(payload);
+        const save = await newUser.save();
 
-        const VerifyEmailUrl = `${process.env.FRONTEND_URL}/verify-email?code=${save?._id}`
+        const VerifyEmailUrl = `${process.env.FRONTEND_URL}/verify-email?code=${save?._id}`;
 
         const verifyEmail = await sendEmail({
-            sendTo : email,
-            subject : "Verify email from QuickCart",
-            html : verifyEmailTemplate({
+            sendTo: email,
+            subject: "Verify your email - CampusKart",
+            html: verifyEmailTemplate({
                 name,
-                url : VerifyEmailUrl
+                url: VerifyEmailUrl
             })
-        })
+        });
 
         return response.json({
-            message : "User register successfully",
-            error : false,
-            success : true,
-            data : save
-        })
+            message: "User registered successfully. Check your email for verification.",
+            error: false,
+            success: true,
+            data: save
+        });
 
     } catch (error) {
         return response.status(500).json({
-            message : error.message || error,
-            error : true,
-            success : false
-        })
+            message: error.message || error,
+            error: true,
+            success: false
+        });
     }
 }
+
 
 export async function verifyEmailController(request,response){
     try {

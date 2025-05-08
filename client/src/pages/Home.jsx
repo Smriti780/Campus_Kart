@@ -1,96 +1,84 @@
-import React from 'react'
-import banner from '../assets/banner.jpg'
-import bannerMobile from '../assets/banner-mobile.jpg'
-import { useSelector } from 'react-redux'
-import { valideURLConvert } from '../utils/valideURLConvert'
-import {Link, useNavigate} from 'react-router-dom'
-import CategoryWiseProductDisplay from '../components/CategoryWiseProductDisplay'
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { valideURLConvert } from '../utils/valideURLConvert';
+import { useNavigate } from 'react-router-dom';
+import CategoryWiseProductDisplay from '../components/CategoryWiseProductDisplay';
 
 const Home = () => {
-  const loadingCategory = useSelector(state => state.product.loadingCategory)
-  const categoryData = useSelector(state => state.product.allCategory)
-  const subCategoryData = useSelector(state => state.product.allSubCategory)
-  const navigate = useNavigate()
+  const loadingCategory = useSelector((state) => state.product.loadingCategory);
+  const categoryData = useSelector((state) => state.product.allCategory);
+  const subCategoryData = useSelector((state) => state.product.allSubCategory);
+  const navigate = useNavigate();
 
-  const handleRedirectProductListpage = (id,cat)=>{
-      console.log(id,cat)
-      const subcategory = subCategoryData.find(sub =>{
-        const filterData = sub.category.some(c => {
-          return c._id == id
-        })
-
-        return filterData ? true : null
-      })
-      const url = `/${valideURLConvert(cat)}-${id}/${valideURLConvert(subcategory.name)}-${subcategory._id}`
-
-      navigate(url)
-      console.log(url)
-  }
-
+  const handleRedirectProductListpage = (id, cat) => {
+    const subcategory = subCategoryData.find((sub) =>
+      sub.category.some((c) => c._id === id)
+    );
+    const url = `/${valideURLConvert(cat)}-${id}/${valideURLConvert(subcategory?.name)}-${subcategory?._id}`;
+    navigate(url);
+  };
 
   return (
-   <section className='bg-white'>
-      <div className='container mx-auto'>
-          <div className={`w-full h-full min-h-48 bg-blue-100 rounded ${!banner && "animate-pulse my-2" } `}>
-              <img
-                src={banner}
-                className='w-full h-full hidden lg:block'
-                alt='banner' 
-              />
-              <img
-                src={bannerMobile}
-                className='w-full h-full lg:hidden'
-                alt='banner' 
-              />
-          </div>
-      </div>
-      
-      <div className='container mx-auto px-4 my-2 grid grid-cols-5 md:grid-cols-8 lg:grid-cols-10  gap-2'>
-          {
-            loadingCategory ? (
-              new Array(12).fill(null).map((c,index)=>{
-                return(
-                  <div key={index+"loadingcategory"} className='bg-white rounded p-4 min-h-36 grid gap-2 shadow animate-pulse'>
-                    <div className='bg-blue-100 min-h-24 rounded'></div>
-                    <div className='bg-blue-100 h-8 rounded'></div>
-                  </div>
-                )
-              })
-            ) : (
-              categoryData.map((cat,index)=>{
-                return(
-                  <div key={cat._id+"displayCategory"} className='w-full h-full' onClick={()=>handleRedirectProductListpage(cat._id,cat.name)}>
-                    <div>
-                        <img 
-                          src={cat.image}
-                          className='w-full h-full object-scale-down'
-                        />
-                    </div>
-                  </div>
-                )
-              })
-              
-            )
-          }
+    <section className="min-h-screen bg-gradient-to-b from-[#27667B] via-[#1E4F5F] to-[#12303A]"> {/* Gradient background */}
+      {/* Hero Section */}
+      <div className="py-20 text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-5xl md:text-6xl font-bold mb-4 animate-fade-in">
+            CampusKart
+          </h1>
+          <p className="text-xl md:text-2xl font-medium mb-6 animate-fade-in">
+            Buy, Sell & Donate within Your Campus – <br />
+            <span className="font-semibold text-blue-200">
+              Smart, Simple, Sustainable!
+            </span>
+          </p>
+          
+        </div>
       </div>
 
-      {/***display category product */}
-      {
-        categoryData?.map((c,index)=>{
-          return(
-            <CategoryWiseProductDisplay 
-              key={c?._id+"CategorywiseProduct"} 
-              id={c?._id} 
-              name={c?.name}
-            />
-          )
-        })
-      }
+      {/* Categories Section */}
+      <div className="container mx-auto px-4 py-12">
+        <h2 className="text-3xl font-bold text-white mb-8 text-center">
+          Shop by Category
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          {loadingCategory
+            ? new Array(6).fill(null).map((_, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-lg p-4 shadow-md animate-pulse"
+                >
+                  <div className="bg-gray-200 h-24 rounded mb-2"></div>
+                  <div className="bg-gray-200 h-6 rounded"></div>
+                </div>
+              ))
+            : categoryData.map((cat) => (
+                <div
+                  key={cat._id}
+                  className="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:shadow-xl transform hover:-translate-y-2 hover:scale-105 transition-all duration-300" // Smooth hover effect
+                  onClick={() => handleRedirectProductListpage(cat._id, cat.name)}
+                >
+                  <img
+                    src={cat.image}
+                    alt={cat.name}
+                    className="w-full h-24 object-cover rounded mb-4"
+                  />
+                  <p className="text-center font-semibold text-gray-800">
+                    {cat.name}
+                  </p>
+                </div>
+              ))}
+        </div>
+      </div>
 
+      {/* Category-wise Product Display */}
+      <div className="container mx-auto px-4 py-12">
+        {categoryData?.map((c) => (
+          <CategoryWiseProductDisplay key={c?._id} id={c?._id} name={c?.name} />
+        ))}
+      </div>
+    </section>
+  );
+};
 
-
-   </section>
-  )
-}
-
-export default Home
+export default Home;
